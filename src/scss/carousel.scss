@@ -50,6 +50,7 @@ $carousel-prefix: '.cs-carousel' !default;
     left: 0;
     position: relative;
     top: 0;
+    transition: left .3s ease;
     width: 4480px; // THIS CAN'T BE HARD CODED - NEEDS TO BE CALCULATED IN THE JS.
 
     // Clearfix
@@ -69,5 +70,11 @@ $carousel-prefix: '.cs-carousel' !default;
     float: left;
     height: 100%;
     min-height: 1px;
+}
+
+#{$carousel-prefix}-prev {
+    &#{$carousel-prefix}-min-reached {
+        display: none;
+    }
 }
 

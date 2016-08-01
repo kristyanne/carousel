@@ -13,7 +13,9 @@ var Carousel = function () {
 
         var defaults = {
             selector: '[data-carousel]',
-            slideSelector: '[data-carousel-slide]'
+            slideSelector: '[data-carousel-slide]',
+            prevBtn: '[data-carousel-prev]',
+            nextBtn: '[data-carousel-next]'
         };
 
         Object.assign(this, defaults, options);
@@ -22,11 +24,16 @@ var Carousel = function () {
         this.carousel = document.querySelectorAll(this.selector)[0];
         this.slides = this.carousel.querySelectorAll(this.slideSelector);
 
-        // Intialise the current slide index.
-        this.currentSlide = 0;
+        // Cache the prev/next nodes.
+        this.prevBtn = document.querySelectorAll(this.prevBtn);
+        this.nextBtn = document.querySelectorAll(this.nextBtn);
 
-        // Intialise the CSS class prefix.
+        // Define some config settings.
+        this.slideCount = this.slides.length;
+        this.currentSlide = 0;
         this.cssPrefix = 'cs-carousel';
+
+        console.log(this);
     }
 
     _createClass(Carousel, [{
@@ -43,16 +50,90 @@ var Carousel = function () {
             });
 
             // Create the slides wrapper node.
-            var slideWrapper = document.createElement('div');
-            slideWrapper.classList.add(this.cssPrefix + '-slides');
+            this.slideWrapper = document.createElement('div');
+            this.slideWrapper.classList.add(this.cssPrefix + '-slides');
 
-            DOMUtils.wrapAll(this.slides, slideWrapper);
+            DOMUtils.wrapAll(this.slides, this.slideWrapper);
 
             // Create the main carousel wrapper node.
             var wrapper = document.createElement('div');
             wrapper.classList.add(this.cssPrefix + '-wrapper');
 
-            DOMUtils.wrap(slideWrapper, wrapper);
+            DOMUtils.wrap(this.slideWrapper, wrapper);
+
+            // Add classes to the prev/next nodes.
+            this.prevBtn.forEach(function (el) {
+                el.classList.add(_this.cssPrefix + '-prev');
+            });
+            this.nextBtn.forEach(function (el) {
+                el.classList.add(_this.cssPrefix + '-next');
+            });
+
+            // Register click events.
+            this.bindEvents();
+        }
+    }, {
+        key: 'checkPrevNext',
+        value: function checkPrevNext() {
+            var _this2 = this;
+
+            if (this.currentSlide === 0) {
+                this.prevBtn.forEach(function (el) {
+                    el.classList.add(_this2.cssPrefix + '-min-reached');
+                });
+            } else {
+                this.prevBtn.forEach(function (el) {
+                    el.classList.remove(_this2.cssPrefix + '-min-reached');
+                });
+            }
+        }
+
+        /**
+         * @return {[type]} [description]
+         */
+
+    }, {
+        key: 'bindEvents',
+        value: function bindEvents() {
+            var _this3 = this;
+
+            // [1]
+            this.prevBtn.forEach(function (el) {
+                el.addEventListener('click', function () {
+                    return _this3.movePrev();
+                });
+            });
+
+            // [2]
+            this.nextBtn.forEach(function (el) {
+                el.addEventListener('click', function () {
+                    return _this3.moveNext();
+                });
+            });
+        }
+    }, {
+        key: 'movePrev',
+        value: function movePrev() {
+            this.moveToIndex(this.currentSlide - 1);
+        }
+    }, {
+        key: 'moveNext',
+        value: function moveNext() {
+            this.moveToIndex(this.currentSlide + 1);
+        }
+    }, {
+        key: 'moveToIndex',
+        value: function moveToIndex(index) {
+            if (index < 0 || index >= this.slideCount) {
+                return;
+            }
+
+            var w = this.carousel.clientWidth * index;
+            this.slideWrapper.style.left = -w + 'px';
+
+            this.currentSlide = index;
+
+            this.checkPrevNext();
         }
     }]);
 

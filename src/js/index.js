@@ -6,7 +6,9 @@ class Carousel {
     constructor( options ) {
         const defaults = {
             selector: '[data-carousel]',
-            slideSelector: '[data-carousel-slide]'
+            slideSelector: '[data-carousel-slide]',
+            prevBtn: '[data-carousel-prev]',
+            nextBtn: '[data-carousel-next]'
         };
 
         Object.assign(this, defaults, options);
@@ -15,14 +17,16 @@ class Carousel {
         this.carousel = document.querySelectorAll(this.selector)[0];
         this.slides = this.carousel.querySelectorAll(this.slideSelector);
 
-        // Intialise the current slide index.
-        this.currentSlide = 0;
+        // Cache the prev/next nodes.
+        this.prevBtn = document.querySelectorAll(this.prevBtn);
+        this.nextBtn = document.querySelectorAll(this.nextBtn);
 
-        // Intialise the CSS class prefix.
+        // Define some config settings.
+        this.slideCount = this.slides.length;
+        this.currentSlide = 0;
         this.cssPrefix = 'cs-carousel';
 
-        this.maxSlideIndex = this.slides.length - 1;
-        this.maxSlideIndex
+        console.log( this );
     }
 
     render() {
@@ -33,16 +37,72 @@ class Carousel {
         this.slides.forEach(slide => slide.classList.add(this.cssPrefix + '-slide'));
 
         // Create the slides wrapper node.
-        let slideWrapper = document.createElement('div');
-        slideWrapper.classList.add(this.cssPrefix + '-slides');
+        this.slideWrapper = document.createElement('div');
+        this.slideWrapper.classList.add(this.cssPrefix + '-slides');
 
-        DOMUtils.wrapAll(this.slides, slideWrapper);
+        DOMUtils.wrapAll(this.slides, this.slideWrapper);
 
         // Create the main carousel wrapper node.
         let wrapper = document.createElement('div');
         wrapper.classList.add(this.cssPrefix + '-wrapper');
 
-        DOMUtils.wrap(slideWrapper, wrapper);
+        DOMUtils.wrap(this.slideWrapper, wrapper);
+
+        // Add classes to the prev/next nodes.
+        this.prevBtn.forEach(el => { el.classList.add(this.cssPrefix + '-prev'); });
+        this.nextBtn.forEach(el => { el.classList.add(this.cssPrefix + '-next'); });
+
+        // Register click events.
+        this.bindEvents();
+    }
+
+    checkPrevNext() {
+        // THIS IS LONG - REFACTOR THIS.
+        if(this.currentSlide === 0) {
+            this.prevBtn.forEach(el => {
+                el.classList.add(this.cssPrefix + '-min-reached');
+            });
+        } else {
+            this.prevBtn.forEach(el => {
+                el.classList.remove(this.cssPrefix + '-min-reached');
+            });
+        }
+    }
+
+    /**
+     * @return {[type]} [description]
+     */
+    bindEvents() {
+        // [1]
+        this.prevBtn.forEach(el => {
+            el.addEventListener('click', () => this.movePrev());
+        });
+
+        // [2]
+        this.nextBtn.forEach(el => {
+            el.addEventListener('click', () => this.moveNext());
+        });
+    }
+
+    movePrev() {
+        this.moveToIndex(this.currentSlide - 1);
+    }
+
+    moveNext() {
+        this.moveToIndex(this.currentSlide + 1);
+    }
+
+    moveToIndex(index) {
+        if(index < 0 || index >= this.slideCount) {
+            return;
+        }
+
+        var w = (this.carousel.clientWidth * index);
+        this.slideWrapper.style.left = -w + 'px';
+
+        this.currentSlide = index;
+
+        this.checkPrevNext();
     }
 }
 

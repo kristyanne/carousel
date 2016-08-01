@@ -9,21 +9,14 @@
 <body>
 
 <div class="carousel" data-carousel>
-    <div class="carousel__slide" data-carousel-slide>Slide One <a id="test" href="/">Click Me</a></div>
+    <div class="carousel__slide" data-carousel-slide>Slide One</div>
     <div class="carousel__slide" data-carousel-slide>Slide Two</div>
     <div class="carousel__slide" data-carousel-slide>Slide Three</div>
 
-    <button>PREV</button>
-    <button>NEXT</button>
+    <button data-carousel-prev>PREV</button>
+    <button data-carousel-next>NEXT</button>
 </div>
 
-
 <script src="dist/carousel.js"></script>
-<script>
-document.getElementById('test').addEventListener('click', (e) => {
-    e.preventDefault();
-    console.log('clicked');
-});
-</script>
 </body>
 </html>
