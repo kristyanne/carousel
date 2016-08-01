@@ -1,0 +1,73 @@
+/**
+ * TODO: Split these out to example dir.
+ * Not needed for carousel core.
+ */
+body {
+    font-family: sans-serif;
+    font-size: 15px;
+    margin: 0;
+    padding: 0;
+}
+
+.carousel {
+    height: 300px;
+    width: 500px;
+}
+
+.carousel__slide {
+    width: 500px;
+}
+
+
+/**
+ * CAROUSEL CORE
+ */
+$carousel-prefix: '.cs-carousel' !default;
+
+#{$carousel-prefix},
+#{$carousel-prefix}-wrapper,
+#{$carousel-prefix}-slides,
+#{$carousel-prefix}-slide {
+    box-sizing: border-box;
+    display: block;
+}
+
+#{$carousel-prefix} {
+    position: relative;
+}
+
+#{$carousel-prefix}-wrapper {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+}
+
+#{$carousel-prefix}-slides {
+    background: red;
+    height: 100%;
+    left: 0;
+    position: relative;
+    top: 0;
+    width: 4480px; // THIS CAN'T BE HARD CODED - NEEDS TO BE CALCULATED IN THE JS.
+
+    // Clearfix
+    &:before,
+    &:after {
+        content: "";
+        display: table;
+    }
+
+    &:after {
+        clear: both;
+    }
+}
+
+#{$carousel-prefix}-slide {
+    background: pink;
+    float: left;
+    height: 100%;
+    min-height: 1px;
+}
+

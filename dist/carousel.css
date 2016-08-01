@@ -1,0 +1,57 @@
+/**
+ * TODO: Split these out to example dir.
+ * Not needed for carousel core.
+ */
+body {
+  font-family: sans-serif;
+  font-size: 15px;
+  margin: 0;
+  padding: 0; }
+
+.carousel {
+  height: 300px;
+  width: 500px; }
+
+.carousel__slide {
+  width: 500px; }
+
+/**
+ * CAROUSEL CORE
+ */
+.cs-carousel,
+.cs-carousel-wrapper,
+.cs-carousel-slides,
+.cs-carousel-slide {
+  box-sizing: border-box;
+  display: block; }
+
+.cs-carousel {
+  position: relative; }
+
+.cs-carousel-wrapper {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  position: relative; }
+
+.cs-carousel-slides {
+  background: red;
+  height: 100%;
+  left: 0;
+  position: relative;
+  top: 0;
+  width: 4480px; }
+  .cs-carousel-slides:before, .cs-carousel-slides:after {
+    content: "";
+    display: table; }
+  .cs-carousel-slides:after {
+    clear: both; }
+
+.cs-carousel-slide {
+  background: pink;
+  float: left;
+  height: 100%;
+  min-height: 1px; }
+
+/*# sourceMappingURL=carousel.css.map */
