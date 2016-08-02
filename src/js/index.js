@@ -8,7 +8,9 @@ class Carousel {
             selector: '[data-carousel]',
             slideSelector: '[data-carousel-slide]',
             prevBtn: '[data-carousel-prev]',
-            nextBtn: '[data-carousel-next]'
+            nextBtn: '[data-carousel-next]',
+            infinite: false,
+            pagination: true
         };
 
         Object.assign(this, defaults, options);
@@ -25,8 +27,6 @@ class Carousel {
         this.slideCount = this.slides.length;
         this.currentSlide = 0;
         this.cssPrefix = 'cs-carousel';
-
-        console.log( this );
     }
 
     render() {
@@ -52,21 +52,30 @@ class Carousel {
         this.prevBtn.forEach(el => { el.classList.add(this.cssPrefix + '-prev'); });
         this.nextBtn.forEach(el => { el.classList.add(this.cssPrefix + '-next'); });
 
+        // Create the pagination nodes.
+        if(this.pagination) {
+            this.buildPagination();
+        }
+
         // Register click events.
         this.bindEvents();
     }
 
-    checkPrevNext() {
-        // THIS IS LONG - REFACTOR THIS.
-        if(this.currentSlide === 0) {
-            this.prevBtn.forEach(el => {
-                el.classList.add(this.cssPrefix + '-min-reached');
-            });
-        } else {
-            this.prevBtn.forEach(el => {
-                el.classList.remove(this.cssPrefix + '-min-reached');
-            });
-        }
+    buildPagination() {
+        let wrapper = document.createElement('ol');
+        wrapper.classList.add(this.cssPrefix + '-pagination');
+
+        this.carousel.appendChild(wrapper);
+
+        this.slides.forEach((slide, index) => {
+            let li = document.createElement('li');
+            li.classList.add(this.cssPrefix + '-pagination-item');
+            li.innerHTML = `<button data-index="${index}">${index + 1}</button>`;
+
+            li.addEventListener('click', () => this.moveToIndex(index));
+
+            wrapper.appendChild(li);
+        });
     }
 
     /**
@@ -84,16 +93,45 @@ class Carousel {
         });
     }
 
+    maxReached(index) {
+        let i = index || this.currentSlide;
+        return i === this.slideCount;
+    }
+
+    minReached(index) {
+        let i = index || this.currentSlide;
+        return i <= 0;
+    }
+
+    /**
+     * Move to the previous slide.
+     *
+     */
     movePrev() {
-        this.moveToIndex(this.currentSlide - 1);
+        let minReached = this.minReached(this.currentSlide - 1);
+        let i = (minReached && this.infinite) ? this.slideCount - 1 : this.currentSlide - 1;
+
+        this.moveToIndex(i);
     }
 
+    /**
+     * Move to the next slide.
+     */
     moveNext() {
-        this.moveToIndex(this.currentSlide + 1);
+        let maxReached = this.maxReached(this.currentSlide + 1);
+        let i = (maxReached && this.infinite) ? 0 : this.currentSlide + 1;
+
+        this.moveToIndex(i);
     }
 
+    /**
+     * Move to a slide by index
+     * @param  {int} index [index of the slide to move to]
+     */
     moveToIndex(index) {
+        // Validate the slide index.
         if(index < 0 || index >= this.slideCount) {
+            console.error('invalid slide index: ' + index);
             return;
         }
 
@@ -101,8 +139,6 @@ class Carousel {
         this.slideWrapper.style.left = -w + 'px';
 
         this.currentSlide = index;
-
-        this.checkPrevNext();
     }
 }
 
@@ -114,6 +150,8 @@ class Carousel {
  */
 
 var element = document.getElementById('carousel');
-var c = new Carousel();
+var c = new Carousel({
+    infinite: true
+});
 
 c.render();

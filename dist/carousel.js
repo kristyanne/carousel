@@ -15,7 +15,9 @@ var Carousel = function () {
             selector: '[data-carousel]',
             slideSelector: '[data-carousel-slide]',
             prevBtn: '[data-carousel-prev]',
-            nextBtn: '[data-carousel-next]'
+            nextBtn: '[data-carousel-next]',
+            infinite: false,
+            pagination: true
         };
 
         Object.assign(this, defaults, options);
@@ -32,8 +34,6 @@ var Carousel = function () {
         this.slideCount = this.slides.length;
         this.currentSlide = 0;
         this.cssPrefix = 'cs-carousel';
-
-        console.log(this);
     }
 
     _createClass(Carousel, [{
@@ -69,23 +69,35 @@ var Carousel = function () {
                 el.classList.add(_this.cssPrefix + '-next');
             });
 
+            // Create the pagination nodes.
+            if (this.pagination) {
+                this.buildPagination();
+            }
+
             // Register click events.
             this.bindEvents();
         }
     }, {
-        key: 'checkPrevNext',
-        value: function checkPrevNext() {
+        key: 'buildPagination',
+        value: function buildPagination() {
             var _this2 = this;
 
-            if (this.currentSlide === 0) {
-                this.prevBtn.forEach(function (el) {
-                    el.classList.add(_this2.cssPrefix + '-min-reached');
+            var wrapper = document.createElement('ol');
+            wrapper.classList.add(this.cssPrefix + '-pagination');
+
+            this.carousel.appendChild(wrapper);
+
+            this.slides.forEach(function (slide, index) {
+                var li = document.createElement('li');
+                li.classList.add(_this2.cssPrefix + '-pagination-item');
+                li.innerHTML = '<button data-index="' + index + '">' + (index + 1) + '</button>';
+
+                li.addEventListener('click', function () {
+                    return _this2.moveToIndex(index);
                 });
-            } else {
-                this.prevBtn.forEach(function (el) {
-                    el.classList.remove(_this2.cssPrefix + '-min-reached');
-                });
-            }
+
+                wrapper.appendChild(li);
+            });
         }
 
         /**
@@ -112,19 +124,56 @@ var Carousel = function () {
             });
         }
     }, {
+        key: 'maxReached',
+        value: function maxReached(index) {
+            var i = index || this.currentSlide;
+            return i === this.slideCount;
+        }
+    }, {
+        key: 'minReached',
+        value: function minReached(index) {
+            var i = index || this.currentSlide;
+            return i <= 0;
+        }
+
+        /**
+         * Move to the previous slide.
+         *
+         */
+
+    }, {
         key: 'movePrev',
         value: function movePrev() {
-            this.moveToIndex(this.currentSlide - 1);
+            var minReached = this.minReached(this.currentSlide - 1);
+            var i = minReached && this.infinite ? this.slideCount - 1 : this.currentSlide - 1;
+
+            this.moveToIndex(i);
         }
+
+        /**
+         * Move to the next slide.
+         */
+
     }, {
         key: 'moveNext',
         value: function moveNext() {
-            this.moveToIndex(this.currentSlide + 1);
+            var maxReached = this.maxReached(this.currentSlide + 1);
+            var i = maxReached && this.infinite ? 0 : this.currentSlide + 1;
+
+            this.moveToIndex(i);
         }
+
+        /**
+         * Move to a slide by index
+         * @param  {int} index [index of the slide to move to]
+         */
+
     }, {
         key: 'moveToIndex',
         value: function moveToIndex(index) {
+            // Validate the slide index.
             if (index < 0 || index >= this.slideCount) {
+                console.error('invalid slide index: ' + index);
                 return;
             }
 
@@ -132,8 +181,6 @@ var Carousel = function () {
             this.slideWrapper.style.left = -w + 'px';
 
             this.currentSlide = index;
-
-            this.checkPrevNext();
         }
     }]);
 
@@ -145,7 +192,9 @@ var Carousel = function () {
  */
 
 var element = document.getElementById('carousel');
-var c = new Carousel();
+var c = new Carousel({
+    infinite: true
+});
 
 c.render();
 
